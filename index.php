@@ -1,66 +1,78 @@
 <?php
+
 require_once 'Autoloader.php';
 Autoloader::register();
 new Api();
 
-class Api
-{
-	private static $db;
+class Api {
 
-	public static function getDb()
-	{
-		return self::$db;
-	}
+    private static $db;
 
-	public function __construct()
-	{
-		self::$db = (new Database())->init();
+    public static function getDb() {
+        return self::$db;
+    }
 
-		$uri = strtolower(trim((string)$_SERVER['PATH_INFO'], '/'));
-		$httpVerb = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'cli';
+    public function __construct() {
+        self::$db = (new Database())->init();
+//                print_r($_SERVER);
+        $uri = strtolower(trim((string) $_SERVER['PATH_INFO'], '/'));
+        $httpVerb = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'cli';
 
-		$wildcards = [
-			':any' => '[^/]+',
-			':num' => '[0-9]+',
-		];
-		$routes = [
-			'get constructionStages' => [
-				'class' => 'ConstructionStages',
-				'method' => 'getAll',
-			],
-			'get constructionStages/(:num)' => [
-				'class' => 'ConstructionStages',
-				'method' => 'getSingle',
-			],
-			'post constructionStages' => [
-				'class' => 'ConstructionStages',
-				'method' => 'post',
-				'bodyType' => 'ConstructionStagesCreate'
-			],
-		];
+        $wildcards = [
+            ':any' => '[^/]+',
+            ':num' => '[0-9]+',
+        ];
+        $routes = [
+            'get constructionStages' => [
+                'class' => 'ConstructionStages',
+                'method' => 'getAll',
+            ],
+            'get constructionStages/(:num)' => [
+                'class' => 'ConstructionStages',
+                'method' => 'getSingle',
+            ],
+            'post constructionStages' => [
+                'class' => 'ConstructionStages',
+                'method' => 'post',
+                'bodyType' => 'ConstructionStagesCreate'
+            ],
+            /// added Api routes  
+            'patch constructionStages/(:num)' => [
+                'class' => 'ConstructionStages',
+                'method' => 'patch',
+            ],
+            
+            'delete constructionStages/(:num)' => [
+                'class' => 'ConstructionStages',
+                'method' => 'delete',
+            ],
+            
+            
+        ];
 
-		$response = [
-			'error' => 'No such route',
-		];
+        $response = [
+            'error' => 'No such route',
+        ];
 
-		if ($uri) {
+        if ($uri) {
 
-			foreach ($routes as $pattern => $target) {
-				$pattern = str_replace(array_keys($wildcards), array_values($wildcards), $pattern);
-				if (preg_match('#^'.$pattern.'$#i', "{$httpVerb} {$uri}", $matches)) {
-					$params = [];
-					array_shift($matches);
-					if ($httpVerb === 'post') {
-						$data = json_decode(file_get_contents('php://input'));
-						$params = [new $target['bodyType']($data)];
-					}
-					$params = array_merge($params, $matches);
-					$response = call_user_func_array([new $target['class'], $target['method']], $params);
-					break;
-				}
-			}
+            foreach ($routes as $pattern => $target) {
+                $pattern = str_replace(array_keys($wildcards), array_values($wildcards), $pattern);
+                if (preg_match('#^' . $pattern . '$#i', "{$httpVerb} {$uri}", $matches)) {
+                    $params = [];
+                    array_shift($matches);
+                    if ($httpVerb === 'post') {
+                        $data = json_decode(file_get_contents('php://input'));
+                        $params = [new $target['bodyType']($data)];
+                    }
+                    $params = array_merge($params, $matches);
+                    $response = call_user_func_array([new $target['class'], $target['method']], $params);
+                    break;
+                }
+            }
 
-			echo json_encode($response, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
-		}
-	}
+            echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        }
+    }
+
 }
