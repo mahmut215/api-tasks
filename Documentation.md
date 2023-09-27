@@ -24,13 +24,12 @@ In this document, you'll find the documentation for all the methods that have be
 - *Parameters:*
   - `$data` (ConstructionStagesCreate): The data for the new construction stage.
 
-### `patch($id, $data)`
+### `patch($id)`
 
 - *Description:* Update an existing construction stage by ID.
 - *Return Type:* `array`
 - *Parameters:*
   - `$id` (int): The ID of the construction stage to update.
-  - `$data` (ConstructionStagesPatch): The data to update the construction stage.
 
 ### `delete($id)`
 
