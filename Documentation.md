@@ -45,31 +45,71 @@ In this document, you'll find the documentation for all the methods that have be
 ## ConstructionStagesPatch Class
 
 - *Description:* This class represents the data structure for patching an existing construction stage.
+# Validation Class Documentation
 
-  # Validation Class Documentation
-
-The `Validation` class provides methods for validating various data fields.
+The `Validation` class is designed to validate various fields in a data object. This documentation provides an overview of the class, its methods, and how to use them.
 
 ## Table of Contents
 
-- [Methods](#methods)
-  - [`validateFields($data)`](#validatefieldsdata)
-  - [`isValidDateTime($dateTime)`](#isvaliddatetimedatetime)
-  - [`isValidHexColor($color)`](#isvalidhexcolorcolor)
-  - [`isValidIso8601Date($date)`](#isvalidiso8601datedate)
+1. [Overview](#overview)
+2. [Methods](#methods)
+   - [validateFields($data)](#validatefieldsdata)
+   - [isValidDateTime($dateTime)](#isvaliddatetimedatetime)
+   - [isValidHexColor($color)](#isvalidhexcolorcolor)
+   - [isValidIso8601Date($date)](#isvalidiso8601datedate)
+3. [Usage Examples](#usage-examples)
+4. [License](#license)
+
+## Overview
+
+The `Validation` class provides a set of methods for validating common data fields such as names, dates, colors, and more. It can be used to ensure that data conforms to specific criteria before processing it further.
 
 ## Methods
 
 ### `validateFields($data)`
 
-This method validates the fields in the provided data object.
+This method validates the fields in the provided data object. It checks the following fields and adds error messages to an array for each validation failure:
 
-- `data` (object): The data object containing fields to be validated.
+- `name`: Checks if the name is not longer than 255 characters.
+- `startDate`: Validates the date and time format (ISO8601) and checks if it's a valid date and time.
+- `end_date`: Validates the date and time format (ISO8601) and checks if it's a valid date and time, as well as if the end date is later than the start date.
+- `durationUnit`: Checks if the duration unit is one of `HOURS`, `DAYS`, or `WEEKS`.
+- `color`: Validates the color format as a HEX color code.
+- `externalId`: Checks if the external ID is not longer than 255 characters.
+- `status`: Checks if the status is one of `NEW`, `PLANNED`, or `DELETED`.
 
-#### Field Validations
+If there are validation errors, it returns a JSON response with error messages.
 
-- `name`: Checks if it's not longer than 255 characters.
-- `startDate`: Validates the date format (ISO8601) using `isValidDateTime()`.
-- `end_date`: Validates the date format (ISO8601) using `isValidIso8601Date()` and checks if end date is later than the start date.
-- `durationUnit`: Checks if it's one of `HOURS`, `DAYS`, or `W
+### `isValidDateTime($dateTime)`
 
+This method checks if a given date and time string is a valid date and time. It returns `true` if the input is a valid date and time, otherwise `false`.
+
+### `isValidHexColor($color)`
+
+This method checks if a given string is a valid HEX color code. It returns `true` if the input is a valid HEX color, otherwise `false`.
+
+### `isValidIso8601Date($date)`
+
+This method checks if a given date string follows the ISO8601 format. It returns `true` if the input is a valid ISO8601 date, otherwise `false`.
+
+## Usage Examples
+
+Here are some usage examples of the `Validation` class:
+
+```php
+// Example 1: Validating data
+$data = (object) [
+    'name' => 'John Doe',
+    'startDate' => '2022-12-31T14:59:00Z',
+    // Include other fields here
+];
+
+Validation::validateFields($data);
+
+// Example 2: Checking if a date is valid
+$date = '2022-12-31T14:59:00Z';
+$isValid = Validation::isValidIso8601Date($date);
+
+// Example 3: Checking if a color is valid
+$color = '#FF0000';
+$isValidColor = Validation::isValidHexColor($color);
